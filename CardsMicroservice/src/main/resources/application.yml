@@ -1,17 +1,14 @@
-server:
-  port: 8081
+#server:
+#  port: ${PORT:8080}
 spring:
   application:
     name: cards
   datasource:
     username: ${SPRING_DATASOURCE_USERNAME}
-    url: ${SPRING_DATASOURCE_URL}
+#    url: ${SPRING_DATASOURCE_URL}
+    url: jdbc:postgresql://34.116.212.216:5432/flashcardsdb
     password: ${SPRING_DATASOURCE_PASSWORD}
   jpa:
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
-        format_sql: 'true'
     hibernate:
    #   ddl-auto: create
       ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO}

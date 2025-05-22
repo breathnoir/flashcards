@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const BASE_URL = import.meta.env.VITE_CARDS_SERVICE_URL;
+const BASE_URL = import.meta.env.VITE_CARDS_SERVICE_URL + "/api";
 
 const cardsApi = axios.create({
   baseURL: BASE_URL,
