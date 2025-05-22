@@ -1,0 +1,81 @@
+services:
+  postgres:
+    container_name: postgres
+    image: postgres
+    environment:
+      POSTGRES_USER: zakopnad
+      POSTGRES_PASSWORD: password
+      PGDATA: /data/postgres
+    volumes:
+      - postgres:/data/postgres
+    ports:
+      - "5432:5432"
+    networks:
+      - backend
+    restart: unless-stopped
+
+  pgadmin:
+    container_name: pgadmin
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-pgadmin4@pgadmin.org}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    volumes:
+      - pgadmin:/var/lib/pgadmin
+    ports:
+      - "5050:80"
+    networks:
+      - backend
+    restart: unless-stopped
+
+  user-service:
+    container_name: user-service
+    build:
+      context: .
+      dockerfile: UserMicroservice/Dockerfile
+    env_file:
+      - ./UserMicroservice/.env
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+    networks:
+      - backend
+
+  cards-service:
+    container_name: cards-service
+    build:
+      context: .
+      dockerfile: CardsMicroservice/Dockerfile
+    env_file:
+      - ./CardsMicroservice/.env
+    ports:
+      - "8081:8081"
+    depends_on:
+      - postgres
+      - user-service
+    networks:
+      - backend
+
+  frontend:
+    container_name: frontend
+    build:
+      context: ./flashcards-frontend
+    env_file:
+      - ./flashcards-frontend/.env
+    ports:
+      - "5173:80"
+    depends_on:
+      - user-service
+      - cards-service
+    networks:
+      - backend
+
+networks:
+  backend:
+    driver: bridge
+
+volumes:
+  postgres:
+  pgadmin:
