@@ -44,7 +44,7 @@ export default function LearningPage() {
           [arr[i], arr[j]] = [arr[j], arr[i]];
         }
 
-        setCards(cardsRes.data);
+        setCards(arr);
         setCurrentIndex(0);
         setCorrectCount(0);
       })

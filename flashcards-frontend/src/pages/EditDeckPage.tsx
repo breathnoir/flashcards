@@ -4,7 +4,7 @@ import {
   Navigate,
   useNavigate,
 } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Navbar from "../components/NavBar";
 import Tag from "../components/Tag";
 import AddTagModal from "../components/modals/AddTagModal.tsx";
@@ -44,6 +44,9 @@ export default function EditDeckPage() {
   const [cards, setCards] = useState<CardDTO[]>([]);
   const [tags, setTags] = useState<TagDTO[]>(deck?.tags || []);
 
+    const origTagIds = useRef<Set<number>>(new Set(deck?.tags.map((t) => t.id)));
+    const origCardIds = useRef<Set<number>>(new Set());
+
   const [selectedCard, setSelectedCard] = useState<CardDTO | undefined>(
     undefined
   );
@@ -53,13 +56,37 @@ export default function EditDeckPage() {
 
     cardsApi
       .get<CardDTO[]>(`/cards/${cardboxId}/all`)
-      .then((r) => setCards(r.data))
+            .then((res) => {
+              setCards(res.data);
+              origCardIds.current = new Set(res.data.map((c) => c.id));
+            })
       .catch(console.error);
   }, [cardboxId]);
 
   async function handleSave() {
-    toast.success("Deck edited successfully");
-    navigate(-1);
+    const newTags = tags.filter((t) => !origTagIds.current.has(t.id));
+
+        const newCards = cards.filter((c) => !origCardIds.current.has(c.id));
+
+        try {
+          await cardsApi.post(`/cardboxes/${cardboxId}/bulk`, {
+            cards: newCards.map((c) => ({
+              question: c.question,
+              answer: c.answer,
+              questionImageId: c.questionImageId,
+              answerImageId: c.answerImageId,
+            })),
+            tagIds: newTags.map((t) => t.id),
+          });
+
+          toast.success("Deck updated successfully!");
+          navigate(-1);
+        } catch (err: any) {
+          console.error(err);
+          toast.error(
+            err.response?.data?.message || "Failed to save new cards/tags"
+          );
+        }
   }
 
   function onTagRemove(id: number) {
@@ -80,6 +107,7 @@ export default function EditDeckPage() {
       } catch (err: any) {
         toast.error(err.response?.data?.message || "Card deletion failed");
       }
+  setEditCardModalOpen(false);
     }
   }
 
@@ -88,13 +116,13 @@ export default function EditDeckPage() {
       sessionStorage.removeItem("draftCards");
       sessionStorage.removeItem("draftTags");
       try {
-        cardsApi.delete(`/cardboxes/${cardboxId}`);
-        userApi.delete(`/collections/${userBoxId}`);
+        await cardsApi.delete(`/cardboxes/${cardboxId}`);
+                await userApi.delete(`/collections/${userBoxId}`);
+                toast.success("Deck deleted successfully");
       } catch (err: any) {
         toast.error(err.response?.data?.message || "Deck deletion failed");
       }
-      toast.success("Deck deleted successfully");
-      navigate("/");
+      window.location.assign("/collection");
     }
   }
 

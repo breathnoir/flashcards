@@ -124,8 +124,7 @@ export default function EditCardModal({
                 size="2x"
                 className="ms-5 text-danger trash-button"
                 onClick={() => {
-                  handleDeleteCard;
-                  onClose();
+                  handleDeleteCard(card.id);
                 }}
               />
               <MDBBtn className="btn-close" color="none" onClick={onClose} />

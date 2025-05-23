@@ -77,9 +77,7 @@ export default function CreateCardModal({
       onClose();
     } catch (err: any) {
       console.error("Failed to create card", err);
-      setError(
-        err.response?.data?.message || "Upload or create request failed."
-      );
+setError(err.response?.data?.error || "Upload or create request failed.");
     } finally {
       setBusy(false);
     }

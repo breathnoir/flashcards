@@ -91,12 +91,11 @@ public class CardBoxController {
     }
 
     @PostMapping("/{cardBoxId}/bulk")
-    public ResponseEntity<CardBox> addCardsAndTags(
+    public ResponseEntity<CardBoxGetDTO> addCardsAndTags(
             @PathVariable Long cardBoxId,
             @RequestBody AddCardsAndTagsDTO dto) {
 
-        CardBox box = cardBoxService.addCardsAndTags(cardBoxId, dto);
-        return ResponseEntity.ok(box);
+        return ResponseEntity.ok(cardBoxService.addCardsAndTags(cardBoxId, dto));
     }
 
     @GetMapping("/search")

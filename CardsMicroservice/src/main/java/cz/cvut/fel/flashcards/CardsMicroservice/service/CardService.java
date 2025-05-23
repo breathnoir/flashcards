@@ -64,4 +64,9 @@ public class CardService {
     public List<CardGetDTO> getCardsByCardBoxId(Long cardBoxId) {
         return cardRepository.findAllByCardBoxId(cardBoxId);
     }
+
+    public void deleteCardByCardBoxId(Long id) {
+        System.out.println("Delete card by card box id: " + id);
+        cardRepository.deleteByCardBoxId(id);
+    }
 }

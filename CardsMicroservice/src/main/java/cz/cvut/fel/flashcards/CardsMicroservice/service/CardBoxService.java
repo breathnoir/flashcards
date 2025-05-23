@@ -60,9 +60,23 @@ public class CardBoxService {
         return getCardBoxMapper.toDto(cardBoxRepository.save(existingCardBox));
     }
 
+    @Transactional
     public void deleteCardBox(Long id) {
-        CardBox cardBox = findCardBoxById(id);
-        cardBoxRepository.delete(cardBox);
+        deleteAllCards(id);
+
+        cardBoxRepository.deleteTagAssociations1(id);
+        cardBoxRepository.deleteTagAssociations2(id);
+
+        cardBoxRepository.deleteById(id);
+    }
+
+    @Transactional
+    void deleteAllCards(Long id) {
+        CardBox existingCardBox = findCardBoxById(id);
+        cardService.deleteCardByCardBoxId(id);
+
+        existingCardBox.getCards().clear();
+        cardBoxRepository.save(existingCardBox);
     }
 
     public CardBox addCardToBox(Long cardBoxId, CardPostDTO cardPostDTO) {
@@ -121,7 +135,7 @@ public class CardBoxService {
                 .toList();
     }
 
-    public CardBox addCardsAndTags(Long cardBoxId, AddCardsAndTagsDTO dto) {
+    public CardBoxGetDTO addCardsAndTags(Long cardBoxId, AddCardsAndTagsDTO dto) {
         CardBox box = cardBoxRepository.findById(cardBoxId)
                 .orElseThrow(() -> new EntityNotFoundException("box"));
         dto.getCards().forEach(cardDto -> {
@@ -132,7 +146,7 @@ public class CardBoxService {
             addTagToBox(box.getId(), tagId);
         });
 
-        return box;
+        return getCardBoxMapper.toDto(box);
     }
 
     public List<CardBoxGetDTO> getCardBoxesByIds(Set<Long> cardBoxIds) {

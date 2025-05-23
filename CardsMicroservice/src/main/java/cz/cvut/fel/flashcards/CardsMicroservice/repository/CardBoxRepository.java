@@ -2,8 +2,10 @@ package cz.cvut.fel.flashcards.CardsMicroservice.repository;
 
 import cz.cvut.fel.flashcards.CardsMicroservice.entity.CardBox;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -26,4 +28,20 @@ public interface CardBoxRepository extends JpaRepository<CardBox, Long> {
 
     @Query("SELECT c FROM CardBox c WHERE c.isPublic = :val ORDER BY c.id DESC")
     List<CardBox> findAllByPublic(@Param("val") boolean value);
+
+    @Modifying
+    @Transactional
+    @Query(
+            value = "DELETE FROM tag_card_boxes WHERE card_boxes_id = :boxId",
+            nativeQuery = true
+    )
+    void deleteTagAssociations1(@Param("boxId") Long boxId);
+
+    @Modifying
+    @Transactional
+    @Query(
+            value = "DELETE FROM card_box_tags WHERE card_box_id = :boxId",
+            nativeQuery = true
+    )
+    void deleteTagAssociations2(@Param("boxId") Long boxId);
 }
