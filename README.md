@@ -1,6 +1,6 @@
 # FlashCards – bakalařský projekt FEL ČVUT
 Webová aplikace pro efektivní učení pomocí flash karet a intervalového opakování.
-* Dostupné na: https://frontend-278072296500.europe-central2.run.app/
+* Dostupné na: [https://frontend-278072296500.europe-central2.run.app/](https://frontend-647416143124.europe-central2.run.app/)
 
 
 ## Hlavní funkce
